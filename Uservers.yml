@@ -5,12 +5,6 @@ Parameters:
     Description: An environment name that will be prefixed to resource names
     Type: String
 
-  InstanceKeyName: 
-    Description: Key name to use for ssh
-    Type: String
-    Default: my_instance_1
-
-
 Resources:
 
   RoleForS3Access:
@@ -65,10 +59,6 @@ Resources:
         FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
       - IpProtocol: tcp
         FromPort: 0
@@ -79,7 +69,6 @@ Resources:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
       IamInstanceProfile: !Ref InstanceProfile
-      KeyName: !Ref InstanceKeyName
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -91,6 +80,7 @@ Resources:
           echo credential_source = Ec2InstanceMetadata  >>  ~/.aws/config
           aws s3 cp s3://website-80763712 /var/www/html --recursive
           sudo service apache2 restart
+          
       ImageId: ami-0279c3b3186e54acd
       KeyName: my_instance_1
       SecurityGroups:
